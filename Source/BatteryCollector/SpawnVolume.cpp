@@ -35,9 +35,6 @@ FVector ASpawnVolume::GetRandomPointInVolume()
 void ASpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);
-	GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolume::SpawnPickup, SpawnDelay, false);
 
 }
 
@@ -77,3 +74,17 @@ void ASpawnVolume::Tick(float DeltaTime)
 
 }
 
+void ASpawnVolume::SetSpawningActive(bool bShouldSpawn)
+{
+	if (bShouldSpawn)
+	{
+		//Set the timer on spawn pikcup
+		SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);
+		GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolume::SpawnPickup, SpawnDelay, false);
+	}
+	else
+	{
+		//clear the timer
+		GetWorldTimerManager().ClearTimer(SpawnTimer);
+	}
+}

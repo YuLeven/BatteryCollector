@@ -26,7 +26,7 @@ bool APickup::IsActive()
 void APickup::WasCollected_Implementation()
 {
 	FString PickupDebugString = GetName();
-	UE_LOG(LogClass, Log, TEXT("You have colelcted %s"), *PickupDebugString);
+	UE_LOG(LogClass, Log, TEXT("You have collected %s"), *PickupDebugString);
 }
 
 //Changes active state

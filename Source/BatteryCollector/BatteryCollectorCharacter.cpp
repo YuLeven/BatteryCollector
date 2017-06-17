@@ -10,6 +10,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Pickup.h"
+#include "BatteryPickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
@@ -55,6 +56,10 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 	//Set a base power level for the character
 	InitialPower = 2000.f;
 	CharacterPower = InitialPower;
+
+	//Set the dependence of the speed on the power level
+	SpeedFactor = 0.75f;
+	BaseSpeed = 10.f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -151,6 +156,9 @@ void ABatteryCollectorCharacter::CollectPickups()
 	TArray<AActor*> CollectedActors;
 	CollectionSphere->GetOverlappingActors(CollectedActors);
 
+	// Keep track of the collected battery power
+	float CollectedPower = 0;
+
 	//Go through the array and for each actor we collect
 	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
 	{
@@ -161,8 +169,22 @@ void ABatteryCollectorCharacter::CollectPickups()
 		{
 			//Call the pickup's WasCollected funcion and deactivate the pickup
 			TestPickup->WasCollected();
+			
+			//Check to see if the pickup is also battery
+			ABatteryPickup* const TestBattery = Cast<ABatteryPickup>(TestPickup);
+			if (TestBattery)
+			{
+				//Increase the collected power
+				CollectedPower += TestBattery->GetPower();
+			}
+
 			TestPickup->SetActive(false);
 		}
+	}
+
+	if (CollectedPower > 0)
+	{
+		UpdatePower(CollectedPower);
 	}
 }
 
@@ -176,7 +198,15 @@ float ABatteryCollectorCharacter::GetCurrentPower()
 	return CharacterPower;
 }
 
+//Called whenever power is increased or decreased
 void ABatteryCollectorCharacter::UpdatePower(float PowerChange)
 {
+	//Change the power
 	CharacterPower += PowerChange;
+
+	//Change speed based on power
+	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed + SpeedFactor * CharacterPower;
+
+	//Call visual effect
+	PowerChangeEffect();
 }
