@@ -45,6 +45,9 @@ private:
 
 	TArray<class ASpawnVolume*> SpawnVolumeActors;
 
+	//Handle any function calls that realy upon changing the playing state of our game
+	void HandleNewState(EBatteryPlayState NewState);
+
 public:
 	ABatteryCollectorGameMode();
 
